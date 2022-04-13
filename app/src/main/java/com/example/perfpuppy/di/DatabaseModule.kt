@@ -2,8 +2,8 @@ package com.example.perfpuppy.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.perfpuppy.data.AlertsDao
-import com.example.perfpuppy.data.AlertsDatabase
+import com.example.perfpuppy.database.AlertsDao
+import com.example.perfpuppy.database.AlertsDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

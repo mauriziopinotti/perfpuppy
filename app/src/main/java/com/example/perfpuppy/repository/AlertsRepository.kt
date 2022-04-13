@@ -2,7 +2,7 @@ package com.example.perfpuppy.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.example.perfpuppy.data.AlertsDatabase
+import com.example.perfpuppy.database.AlertsDatabase
 import com.example.perfpuppy.database.DatabaseAlertItem
 import com.example.perfpuppy.database.asDomainModel
 import com.example.perfpuppy.domain.AlertItem

@@ -11,7 +11,7 @@
         <entry key="app/src/main/res/drawable/ic_tab_settings.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1890625" />
         <entry key="app/src/main/res/layout/fragment_alerts.xml" value="0.2296875" />
-        <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.4041025641025641" />
+        <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.2171875" />
         <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.4041025641025641" />
         <entry key="app/src/main/res/layout/item_alert.xml" value="0.2734375" />
         <entry key="app/src/main/res/layout/sample_empty_view.xml" value="0.1" />

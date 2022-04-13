@@ -1,26 +1,19 @@
-package com.example.perfpuppy.data
+package com.example.perfpuppy.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.perfpuppy.database.DatabaseAlertItem
 
 @Dao
 interface AlertsDao {
 
-    @Query("select * from alerts")
+    @Query("SELECT * FROM alerts ORDER BY created_at DESC")
     fun getDatabaseAlerts(): LiveData<List<DatabaseAlertItem>>
-
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    fun insertAll(alerts: List<DatabaseAlertItem>)
 
     @Insert
     fun insert(alerts: DatabaseAlertItem)
-
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    fun insertAlertDetails(databaseAlertDetails: DatabaseAlertDetails)
 }
 
-@Database(entities = [DatabaseAlertItem::class], version = 3)
+@Database(entities = [DatabaseAlertItem::class], version = 4)
 abstract class AlertsDatabase : RoomDatabase() {
     abstract val alertsDao: AlertsDao
 }

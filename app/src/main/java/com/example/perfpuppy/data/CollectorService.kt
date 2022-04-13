@@ -18,6 +18,8 @@ import com.example.perfpuppy.MainActivity
 import com.example.perfpuppy.R
 import com.example.perfpuppy.data.agent.Agent
 import com.example.perfpuppy.data.agent.CpuAgent
+import com.example.perfpuppy.data.agent.MemoryAgent
+import com.example.perfpuppy.domain.AlertItem
 import com.example.perfpuppy.repository.AlertsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +50,12 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private lateinit var cpuAgentJob: Job
-    private lateinit var memAgentJob: Job
-    private lateinit var batAgentJob: Job
+    private var cpuAgent: Agent? = null
+    private var cpuAgentJob: Job? = null
+    private var memAgent: Agent? = null
+    private var memAgentJob: Job? = null
+    private var batAgent: Agent? = null
+    private var batAgentJob: Job? = null
 
     private val notifIds = mutableMapOf<Agent, Int>()
 
@@ -68,49 +73,70 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
     override fun onCreate() {
         super.onCreate()
 
+        // Create a notification to avoid being killed
         createNotificationChannels()
         startForeground(FOREGROUND__NOTIF_ID, createForegroundNotification())
+
+        // Start all agents
+        startAgents()
     }
 
-    fun spawnAgents() {
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // Clear all notifications
+        notificationManager.cancelAll()
+
+        // Stop all agents
+        stopAgents()
+    }
+
+    private fun startAgents() {
         // Spawn agents
         thread(start = true) {
             runBlocking {
                 var notifId = 1;
 
-                val cpuAgent = CpuAgent(this@CollectorService, lifecycle);
-                notifIds[cpuAgent] = notifId++
+                // CPU agent
+                cpuAgent = CpuAgent(this@CollectorService, lifecycle);
+                notifIds[cpuAgent!!] = notifId++
                 cpuAgentJob = launch(Dispatchers.IO) {
-                    cpuAgent.enable()
+                    cpuAgent!!.enable()
                 }
+
+                // Memory agent
+                memAgent = MemoryAgent(this@CollectorService, lifecycle);
+                notifIds[memAgent!!] = notifId++
+                memAgentJob = launch(Dispatchers.IO) {
+                    memAgent!!.enable()
+                }
+
+                // Battery agent
+//                batAgent = BatteryAgent(this@CollectorService, lifecycle);
+//                notifIds[batAgent!!] = notifId++
+//                batAgentJob = launch(Dispatchers.IO) {
+//                    batAgent!!.enable()
+//                }
             }
         }
 
-//        val foregroundNotification = NotificationCompat.Builder(this, FOREGROUND_CHANNEL_ID)
-//            .setSmallIcon(R.drawable.ic_notification)
-//            .setLargeIcon(
-//                BitmapFactory.decodeResource(
-//                    resources,
-//                    R.drawable.ic_launcher_foreground,
-//                    null
-//                )
-//            )
-//            .setContentTitle("TEST TITLE")
-//            .setContentText("TEST CONTENT")
-//            .setStyle(NotificationCompat.BigTextStyle().bigText("BLABLABLA"))
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .setWhen(0) // removes the time
-//            .setOngoing(true)
-//            .setContentIntent(contentIntent)
-//            .build()
 
 //        val bm = getSystemService(BATTERY_SERVICE) as BatteryManager
 //        println("BATTERY_PROPERTY_CURRENT_NOW: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW))
 //        println("BATTERY_PROPERTY_STATUS: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_STATUS))
 //        println("BATTERY_PROPERTY_CHARGE_COUNTER: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER))
 //        println("BATTERY_PROPERTY_CURRENT_AVERAGE: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE))
+    }
 
+    private fun stopAgents() {
+        cpuAgent?.disable()
+        cpuAgentJob?.cancel()
 
+        memAgent?.disable()
+        memAgentJob?.cancel()
+
+        batAgent?.disable()
+        batAgentJob?.cancel()
     }
 
     private fun createNotificationChannels() {
@@ -173,29 +199,31 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
 
     override val context: Context by lazy { applicationContext }
 
-    override fun onDataAboveTh(agent: Agent, value: Int) {
+    override suspend fun onDataAboveTh(agent: Agent, value: Int) {
         Timber.w("onDataAboveTh(): agent=${agent.name}, value=$value")
 
+        // Log the alert in the repository
+        val message = agent.aboveThMessage(value)
+        alertsRepository.addAlert(AlertItem(message = message, aboveTh = true))
+
         // Create or update the notification for this agent
-        notificationManager.notify(
-            notifIds[agent]!!,
-            createAlertNotification(agent, agent.aboveThMessage(value))
-        )
+        notificationManager.notify(notifIds[agent]!!, createAlertNotification(agent, message))
     }
 
-    override fun onDataBelowTh(agent: Agent, value: Int) {
+    override suspend fun onDataBelowTh(agent: Agent, value: Int) {
         Timber.w("onDataBelowTh(): agent=${agent.name}, value=$value")
 
+        // Log the alert in the repository
+        val message = agent.belowThMessage(value)
+        alertsRepository.addAlert(AlertItem(message = message, aboveTh = false))
+
         // Create or update the notification for this agent
-        notificationManager.notify(
-            notifIds[agent]!!,
-            createAlertNotification(agent, agent.belowThMessage(value))
-        )
+        notificationManager.notify(notifIds[agent]!!, createAlertNotification(agent, message))
     }
 }
 
 interface CollectorServiceCallback {
     val context: Context
-    fun onDataAboveTh(agent: Agent, value: Int)
-    fun onDataBelowTh(agent: Agent, value: Int)
+    suspend fun onDataAboveTh(agent: Agent, value: Int)
+    suspend fun onDataBelowTh(agent: Agent, value: Int)
 }

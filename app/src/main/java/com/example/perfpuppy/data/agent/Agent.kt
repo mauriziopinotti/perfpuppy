@@ -64,8 +64,17 @@ abstract class Agent(
         }
     }
 
-    override fun onStop(owner: LifecycleOwner) {
+    fun disable() {
         enabled = false
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        disable()
+    }
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        super.onDestroy(owner)
+        disable()
     }
 
     private suspend fun collectDataLoop() {

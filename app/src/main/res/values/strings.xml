@@ -5,14 +5,23 @@
     <string name="title_settings">Settings</string>
     <string name="title_alerts">Alerts</string>
 
+    <string name="dashboard_help">
+        Welcome to PerfPuppy!\n\n
+        You can enable or disable data collection with the toggle button below.\n
+        PerfPuppy comes with sensible default but can tweak it to your needs in the \"Settings\" section.\n
+        All alerts will be stored in a database and you can view them in the \"Alerts\" section but don\'t forget to clear app data every now and then.\n
+    </string>
+    <string name="enable">Enable data collection</string>
+    <string name="disable">Disable data collection</string>
+
     <string name="no_alerts">Wow, such empty!</string>
 
     <string name="pref_cpu_th">CPU Alert Threshold (%)</string>
-    <string name="pref_cpu_th_help">The CPU usage threshold above which PerfPuppy will generate al alert. Please notice that CPU usage computation may vary depending on device and OS version.</string>
+    <string name="pref_cpu_th_help">The CPU usage threshold above which PerfPuppy will generate an alert. Please notice that CPU usage computation may vary depending on device and OS version.</string>
     <string name="pref_mem_th">Memory Alert Threshold (%)</string>
-    <string name="pref_mem_th_help">The memory usage threshold above which PerfPuppy will generate al alert.</string>
+    <string name="pref_mem_th_help">The memory usage threshold above which PerfPuppy will generate an alert.</string>
     <string name="pref_bat_th">Battery Alert Threshold (%)</string>
-    <string name="pref_bat_th_help">The battery usage threshold above which PerfPuppy will generate al alert.</string>
+    <string name="pref_bat_th_help">The battery usage threshold below which PerfPuppy will generate an alert.</string>
     <string name="pref_enable_background">Collect data in background</string>
     <string name="pref_enable_background_help">Enable data collection in background. Beware: this could cause a huge battery drain.</string>
     <string name="cpu_alert_pref_key">cpuAlertTh</string>

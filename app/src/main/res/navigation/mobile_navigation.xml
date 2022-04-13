@@ -12,14 +12,15 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
+        android:id="@+id/navigation_alerts"
+        android:name="com.example.perfpuppy.ui.alerts.AlertsFragment"
+        android:label="@string/title_alerts"
+        tools:layout="@layout/fragment_alerts" />
+
+    <fragment
         android:id="@+id/navigation_settings"
         android:name="com.example.perfpuppy.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
 
-    <fragment
-        android:id="@+id/navigation_alerts"
-        android:name="com.example.perfpuppy.ui.alerts.AlertsFragment"
-        android:label="@string/title_alerts"
-        tools:layout="@layout/fragment_alerts" />
 </navigation>

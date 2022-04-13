@@ -66,7 +66,7 @@ class CpuAgent(
                 return method.invoke()
         } catch (e: NotSupportedException) {
             // Not supported, save this in prefs so that we don't try again next time
-            Timber.i("$method is not supported on this device")
+            Timber.w("$method is not supported on this device")
             if (prefKey != null) prefs.edit().putBoolean(prefKey, false).apply()
         }
         return null
@@ -75,7 +75,6 @@ class CpuAgent(
     private suspend fun getFromProcStat(): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             val (workBefore, totalBefore) = parseProcStat()
-            Timber.w("SLEEPING ON ${Thread.currentThread().name}")
             delay(1000)
             val (workAfter, totalAfter) = parseProcStat()
 
@@ -90,16 +89,17 @@ class CpuAgent(
         }
     }
 
-    private suspend fun parseProcStat(): List<Long> {
+    private fun parseProcStat(): List<Long> {
         // CPU usage percents calculation, it is possible negative values or values higher than 100% may appear.
         // http://kernel.org/doc/Documentation/filesystems/proc.txt
         val reader = BufferedReader(FileReader("/proc/stat"))
         val sa = reader.readLine().split("[ ]+".toRegex(), 9).toTypedArray()
-        val work: Long = sa[1].toLong() + sa[2].toLong() + sa[3].toLong()
-        val total = work + sa[4].toLong() + sa[5].toLong() + sa[6].toLong() + sa[7].toLong()
         reader.close()
 
-        return listOf<Long>(work, total)
+        val work: Long = sa[1].toLong() + sa[2].toLong() + sa[3].toLong()
+        val total = work + sa[4].toLong() + sa[5].toLong() + sa[6].toLong() + sa[7].toLong()
+
+        return listOf(work, total)
     }
 
     private suspend fun getFromVmStat(): Int {

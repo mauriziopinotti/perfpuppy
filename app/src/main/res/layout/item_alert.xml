@@ -17,30 +17,41 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> clickListener.onClick(data)}">
+        android:onClick="@{() -> clickListener.onClick(data)}"
+        android:padding="8dp">
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="8dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="@{data.message}"
-            android:src="@drawable/ic_tab_alerts"
+            android:src="@{data.aboveTh ? @drawable/ic_alert_on :@drawable/ic_alert_off}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-        <!--        app:imageUrl="@{data.avatar}"-->
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_tab_alerts" />
 
         <TextView
-            android:id="@+id/text"
+            android:id="@+id/message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
             android:text="@{data.message}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textAppearance="?android:textAppearanceMedium"
             app:layout_constraintStart_toEndOf="@id/image"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Hello" />
+            tools:text="CPU usage is high: 89%" />
+
+        <TextView
+            android:id="@+id/timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@{data.formattedDate}"
+            android:textAppearance="?android:textAppearanceSmall"
+            app:layout_constraintStart_toStartOf="@id/message"
+            app:layout_constraintTop_toBottomOf="@id/message"
+            tools:text="Wed, 4 Jul 2001 12:08:56" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
