@@ -11,13 +11,28 @@
     <string name="pref_cpu_th_help">The CPU usage threshold above which PerfPuppy will generate al alert. Please notice that CPU usage computation may vary depending on device and OS version.</string>
     <string name="pref_mem_th">Memory Alert Threshold (%)</string>
     <string name="pref_mem_th_help">The memory usage threshold above which PerfPuppy will generate al alert.</string>
-    <string name="pref_battery_th">Battery Alert Threshold (%)</string>
-    <string name="pref_battery_th_help">The battery usage threshold above which PerfPuppy will generate al alert.</string>
+    <string name="pref_bat_th">Battery Alert Threshold (%)</string>
+    <string name="pref_bat_th_help">The battery usage threshold above which PerfPuppy will generate al alert.</string>
     <string name="pref_enable_background">Collect data in background</string>
     <string name="pref_enable_background_help">Enable data collection in background. Beware: this could cause a huge battery drain.</string>
-    <string name="cpuAlertPrefKey">cpuAlertTh</string>
-    <string name="memAlertPrefKey">memAlertTh</string>
-    <string name="batteryAlertPrefKey">batteryAlertTh</string>
-    <string name="enableBackgroundServicePrefKey">enableBackgroundService</string>
+    <string name="cpu_alert_pref_key">cpuAlertTh</string>
+    <string name="mem_alert_pref_key">memAlertTh</string>
+    <string name="bat_alert_pref_key">batteryAlertTh</string>
+    <string name="enable_bg_service_pref_key">enableBackgroundService</string>
+
+    <string name="cpu_agent_name">CPU Agent</string>
+    <string name="mem_agent_name">Memory Agent</string>
+    <string name="bat_agent_name">Battery Agent</string>
+
+    <string name="notif_foreground_channel_name">Background service</string>
+    <string name="notif_threshold_channel_name">Alerts</string>
+    <string name="notif_background_message">Collector service is active and reading values in background</string>
+
+    <string name="cpu_above_th_message">CPU usage is high: %1$d%%</string>
+    <string name="cpu_below_th_message">CPU usage is back to normal</string>
+    <string name="mem_above_th_message">Memory usage is high: %1$d%%</string>
+    <string name="mem_below_th_message">Memory usage is back to normal</string>
+    <string name="bat_above_th_message">Battery level is low: %1$d%%</string>
+    <string name="bat_below_th_message">Battery level is back to normal</string>
 
 </resources>

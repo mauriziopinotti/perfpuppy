@@ -5,8 +5,8 @@
     <SeekBarPreference
         android:max="100"
         app:defaultValue="80"
-        app:icon="@drawable/ic_cpu"
-        app:key="@string/cpuAlertPrefKey"
+        app:icon="@drawable/ic_agent_cpu"
+        app:key="@string/cpu_alert_pref_key"
         app:min="0"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
@@ -16,8 +16,8 @@
     <SeekBarPreference
         android:max="100"
         app:defaultValue="80"
-        app:icon="@drawable/ic_mem"
-        app:key="@string/memAlertPrefKey"
+        app:icon="@drawable/ic_agent_mem"
+        app:key="@string/mem_alert_pref_key"
         app:min="0"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
@@ -27,18 +27,18 @@
     <SeekBarPreference
         android:max="100"
         app:defaultValue="80"
-        app:icon="@drawable/ic_battery"
-        app:key="@string/batteryAlertPrefKey"
+        app:icon="@drawable/ic_agent_bat"
+        app:key="@string/bat_alert_pref_key"
         app:min="0"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:summary="@string/pref_battery_th_help"
-        app:title="@string/pref_battery_th" />
+        app:summary="@string/pref_bat_th_help"
+        app:title="@string/pref_bat_th" />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
-        app:icon="@drawable/ic_backgound_service"
-        app:key="@string/enableBackgroundServicePrefKey"
+        app:icon="@drawable/ic_pref_bg_service"
+        app:key="@string/enable_bg_service_pref_key"
         app:summary="@string/pref_enable_background_help"
         app:title="@string/pref_enable_background" />
 
