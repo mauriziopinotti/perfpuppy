@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SeekBarPreference
+        android:max="100"
+        app:defaultValue="80"
+        app:icon="@drawable/ic_cpu"
+        app:key="@string/cpuAlertPrefKey"
+        app:min="0"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:summary="@string/pref_cpu_th_help"
+        app:title="@string/pref_cpu_th" />
+
+    <SeekBarPreference
+        android:max="100"
+        app:defaultValue="80"
+        app:icon="@drawable/ic_mem"
+        app:key="@string/memAlertPrefKey"
+        app:min="0"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:summary="@string/pref_mem_th_help"
+        app:title="@string/pref_mem_th" />
+
+    <SeekBarPreference
+        android:max="100"
+        app:defaultValue="80"
+        app:icon="@drawable/ic_battery"
+        app:key="@string/batteryAlertPrefKey"
+        app:min="0"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:summary="@string/pref_battery_th_help"
+        app:title="@string/pref_battery_th" />
+
+    <SwitchPreferenceCompat
+        android:defaultValue="true"
+        app:icon="@drawable/ic_backgound_service"
+        app:key="@string/enableBackgroundServicePrefKey"
+        app:summary="@string/pref_enable_background_help"
+        app:title="@string/pref_enable_background" />
+
+</PreferenceScreen>
