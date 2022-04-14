@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "302575283212",
+    "project_id": "perfpuppy",
+    "storage_bucket": "perfpuppy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302575283212:android:dbd643ddcbc6c760069229",
+        "android_client_info": {
+          "package_name": "com.example.perfpuppy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302575283212-bpuuoau3ed958kje66tbhv7smjkcvd2o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.perfpuppy",
+            "certificate_hash": "c3cf431382648c16ab9e1299d7347024728b2bab"
+          }
+        },
+        {
+          "client_id": "302575283212-bv0nh87lb3n0isrrhblv7036j9fc63dc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_NqK_h8pBTjq9RyFxmC9rq589tGtPRCU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302575283212-bv0nh87lb3n0isrrhblv7036j9fc63dc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
