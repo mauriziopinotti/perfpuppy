@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="cpu_alert_default_th">70</integer>
+    <integer name="mem_alert_default_th">80</integer>
+    <integer name="bat_alert_default_th">30</integer>
+</resources>

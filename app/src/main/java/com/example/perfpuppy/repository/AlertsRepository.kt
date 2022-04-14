@@ -3,7 +3,6 @@ package com.example.perfpuppy.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.example.perfpuppy.database.AlertsDatabase
-import com.example.perfpuppy.database.DatabaseAlertItem
 import com.example.perfpuppy.database.asDomainModel
 import com.example.perfpuppy.domain.AlertItem
 import com.example.perfpuppy.domain.asDatabaseModel
@@ -20,10 +19,6 @@ class AlertsRepository @Inject constructor(
         Transformations.map(database.alertsDao.getDatabaseAlerts()) {
             it.asDomainModel()
         }
-
-//    suspend fun getAlerts(): LiveData<List<DatabaseAlertItem>> {
-//        return database.alertsDao.getDatabaseAlerts()
-//    }
 
     fun addAlert(alert: AlertItem) {
         CoroutineScope(Dispatchers.IO).launch {

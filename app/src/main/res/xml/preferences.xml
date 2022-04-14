@@ -4,7 +4,7 @@
 
     <SeekBarPreference
         android:max="100"
-        app:defaultValue="80"
+        app:defaultValue="@integer/cpu_alert_default_th"
         app:icon="@drawable/ic_agent_cpu"
         app:key="@string/cpu_alert_pref_key"
         app:min="0"
@@ -15,7 +15,7 @@
 
     <SeekBarPreference
         android:max="100"
-        app:defaultValue="80"
+        app:defaultValue="@integer/mem_alert_default_th"
         app:icon="@drawable/ic_agent_mem"
         app:key="@string/mem_alert_pref_key"
         app:min="0"
@@ -26,7 +26,7 @@
 
     <SeekBarPreference
         android:max="100"
-        app:defaultValue="80"
+        app:defaultValue="@integer/bat_alert_default_th"
         app:icon="@drawable/ic_agent_bat"
         app:key="@string/bat_alert_pref_key"
         app:min="0"
@@ -36,7 +36,14 @@
         app:title="@string/pref_bat_th" />
 
     <SwitchPreferenceCompat
-        android:defaultValue="true"
+        android:defaultValue="@bool/enable_below_th_default_value"
+        app:icon="@drawable/ic_alert_off"
+        app:key="@string/enable_below_th_pref_key"
+        app:summary="@string/pref_enable_below_th_help"
+        app:title="@string/pref_enable_below_th" />
+
+    <SwitchPreferenceCompat
+        android:defaultValue="@bool/enable_bg_service_default_value"
         app:icon="@drawable/ic_pref_bg_service"
         app:key="@string/enable_bg_service_pref_key"
         app:summary="@string/pref_enable_background_help"

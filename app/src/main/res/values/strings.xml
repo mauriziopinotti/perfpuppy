@@ -24,10 +24,14 @@
     <string name="pref_bat_th_help">The battery usage threshold below which PerfPuppy will generate an alert.</string>
     <string name="pref_enable_background">Collect data in background</string>
     <string name="pref_enable_background_help">Enable data collection in background. Beware: this could cause a huge battery drain.</string>
+    <string name="pref_enable_below_th">Log when back to normal</string>
+    <string name="pref_enable_below_th_help">Enable this option to log when a metric is back to normal.</string>
+
     <string name="cpu_alert_pref_key">cpuAlertTh</string>
     <string name="mem_alert_pref_key">memAlertTh</string>
     <string name="bat_alert_pref_key">batteryAlertTh</string>
     <string name="enable_bg_service_pref_key">enableBackgroundService</string>
+    <string name="enable_below_th_pref_key">enableBelowTh</string>
 
     <string name="cpu_agent_name">CPU Agent</string>
     <string name="mem_agent_name">Memory Agent</string>

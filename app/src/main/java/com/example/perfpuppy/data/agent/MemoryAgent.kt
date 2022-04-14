@@ -22,7 +22,10 @@ class MemoryAgent(
         context.getString(R.string.mem_below_th_message)
 
     override suspend fun getData(): PerfValue {
-        val th = prefs.getInt(context.getString(R.string.mem_alert_pref_key), 0)
+        val th = prefs.getInt(
+            context.getString(R.string.mem_alert_pref_key),
+            context.resources.getInteger(R.integer.mem_alert_default_th)
+        )
 
         return parseProcMemInfo().toPerfValue(th)
     }
@@ -40,12 +43,16 @@ class MemoryAgent(
             // MemFree: the amount of physical RAM, in KB, left unused by the system.
             val total = lines[0][1].toLong()
             val free = lines[1][1].toLong()
-            val available = lines[2][1].toLong()
+            val hasAvailableMem = lines[2][0].startsWith("MemAvailable")
+            val available = if (hasAvailableMem) lines[2][1].toLong() else 0
             val cached = lines[3][1].toLong()
-//            val used = total - free - cached
-            val used = available * 100 / total
 
-            return 100 - used.toInt()
+            // Some devices (e.g. Nexus 4) don't have MemAvailable, in that case fallback to MemFree
+            val used =
+                if (hasAvailableMem) total - available
+                else total - free - cached
+
+            return (used * 100 / total).toInt()
         } catch (e: Exception) {
             Timber.w("Cannot parse /proc/meminfo", e)
             return 0

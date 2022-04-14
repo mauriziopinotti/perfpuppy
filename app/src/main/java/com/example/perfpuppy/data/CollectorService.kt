@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
+import androidx.preference.PreferenceManager
 import com.example.perfpuppy.MainActivity
 import com.example.perfpuppy.R
 import com.example.perfpuppy.data.agent.Agent
@@ -178,14 +179,21 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
     }
 
     override fun onDataBelowTh(agent: Agent, value: Int) {
-        Timber.w("onDataBelowTh(): agent=${agent.name}, value=$value")
+        val notifBelowThEnabled = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+            .getBoolean(
+                getString(R.string.enable_below_th_pref_key),
+                resources.getBoolean(R.bool.enable_below_th_default_value)
+            )
+        Timber.w("onDataBelowTh(): agent=${agent.name}, value=$value notifEnabled=$notifBelowThEnabled")
 
-        // Log the alert in the repository
-        val message = agent.belowThMessage(value)
-        alertsRepository.addAlert(AlertItem(message = message, aboveTh = false))
+        if (notifBelowThEnabled) {
+            // Log the alert in the repository
+            val message = agent.belowThMessage(value)
+            alertsRepository.addAlert(AlertItem(message = message, aboveTh = false))
 
-        // Create or update the notification for this agent
-        notificationManager.notify(notifIds[agent]!!, createAlertNotification(agent, message))
+            // Create or update the notification for this agent
+            notificationManager.notify(notifIds[agent]!!, createAlertNotification(agent, message))
+        }
     }
 }
 

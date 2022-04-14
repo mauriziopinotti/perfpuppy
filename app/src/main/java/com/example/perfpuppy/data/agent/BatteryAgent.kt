@@ -32,7 +32,10 @@ class BatteryAgent(
     }
 
     private fun parseBatteryLevelIntent(intent: Intent) {
-        val th = prefs.getInt(context.getString(R.string.bat_alert_pref_key), 0)
+        val th = prefs.getInt(
+            context.getString(R.string.bat_alert_pref_key),
+            context.resources.getInteger(R.integer.bat_alert_default_th)
+        )
 
         val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
         val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0)
@@ -42,7 +45,7 @@ class BatteryAgent(
     }
 
     override suspend fun getData(): PerfValue {
-        // Not implemented
+        // Not needed, data will be reported using batteryLevelReceiver
         return 0.toPerfValue(0)
     }
 

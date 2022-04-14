@@ -45,7 +45,10 @@ class CpuAgent(
         // TODO: try to investigate HardwarePropertiesManager,
         // see https://developer.android.com/reference/android/os/HardwarePropertiesManager
 
-        val th = prefs.getInt(context.getString(R.string.cpu_alert_pref_key), 0)
+        val th = prefs.getInt(
+            context.getString(R.string.cpu_alert_pref_key),
+            context.resources.getInteger(R.integer.cpu_alert_default_th)
+        )
         var data: Int?
 
         // Try /proc/stat
@@ -135,7 +138,7 @@ class CpuAgent(
                 .bufferedReader()
                 .use { it.readText() }
 
-            // Try mothod 1 (newe devices like Pixel 4)
+            // Try method 1 (new devices like Pixel 4)
             val m1: Matcher = TOP_PATTERN_1.matcher(output)
             if (m1.find()) {
                 val total = m1.group(1)?.toInt() ?: 0

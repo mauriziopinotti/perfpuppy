@@ -11,8 +11,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(SingletonComponent::class)
 object DatabaseModule {
     @Provides
     @Singleton
@@ -28,5 +28,4 @@ object DatabaseModule {
     fun provideChannelDao(alertsDatabase: AlertsDatabase): AlertsDao {
         return alertsDatabase.alertsDao
     }
-
 }

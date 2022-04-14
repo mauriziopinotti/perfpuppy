@@ -47,17 +47,22 @@ abstract class Agent(
     private var enabled = false
     private var currentlyAboveTh = false
 
+    /**
+     * Enable agent and start collecting data.
+     * The default behavior is to create an infinite loop and call getData() every X seconds.
+     * This method can be overridden by subclasses to implement custom behavior.
+     */
     open suspend fun enable() {
-        if (!enabled && lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-            enabled = true
-            currentlyAboveTh = false
-            collectDataLoop()
-        }
+        Timber.d("Agent lifecycle: enable=$enabled $name")
+
+        collectDataLoop()
     }
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         Timber.d("Agent lifecycle: onCreate $name")
+
+        enabled = true
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
@@ -70,6 +75,7 @@ abstract class Agent(
     private suspend fun collectDataLoop() {
         Timber.i("Starting loop for agent $name on thread ${Thread.currentThread().name}")
 
+        currentlyAboveTh = false
         while (enabled) {
             // Get data
             setData(getData())

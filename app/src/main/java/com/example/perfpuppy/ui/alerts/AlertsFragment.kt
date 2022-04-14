@@ -27,18 +27,10 @@ class AlertsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        val notificationsViewModel =
-//            ViewModelProvider(this).get(AlertsViewModel::class.java)
-
         _binding = FragmentAlertsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         binding.recyclerView.adapter = adapter
-
-//        val textView: TextView = binding.textNotifications
-//        notificationsViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
 
         return root
     }

@@ -14,7 +14,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
-
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -45,7 +44,10 @@ class MainActivity : AppCompatActivity() {
 
         // Stop collector service if background mode is disabled
         val bgServiceEnabled = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-            .getBoolean(getString(R.string.enable_bg_service_pref_key), false)
+            .getBoolean(
+                getString(R.string.enable_bg_service_pref_key),
+                resources.getBoolean(R.bool.enable_bg_service_default_value)
+            )
         Timber.d("onStop: background service enabled: $bgServiceEnabled")
         if (!bgServiceEnabled) {
             stopService(Intent(this, CollectorService::class.java))

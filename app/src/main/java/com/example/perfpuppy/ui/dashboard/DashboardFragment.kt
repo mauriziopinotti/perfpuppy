@@ -29,7 +29,7 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        binding.serviceToggleButtonGroup.addOnButtonCheckedListener() { _, _, isChecked ->
+        binding.serviceToggleButtonGroup.addOnButtonCheckedListener { _, _, isChecked ->
             toggleCollectorService(isChecked)
             setServiceToggleButtonText(isChecked)
         }
