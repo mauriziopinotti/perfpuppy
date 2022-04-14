@@ -79,7 +79,7 @@ Plase notice the value reported to `CollectorService` is a `PerfValue` object wi
 
 Finally, enable the agent by modifying `CollectorService.spawnAgents()` and add the new agent to the `agents` list.
 
-### CPU load
+### CPU load caveats
 
 Starting from Android O it's no longer possible to collect cpu usage bacause it's an "information leak". See this [official thread](https://issuetracker.google.com/issues/37140047?pli=1). In the app I've implemented a few workarounds but they only work on older and rooted devices. In the market there are a few "cpu monitoring" tools, all of them either don't work or use the cpu frequency to assume the load. Since this approach is totally misleading I've decided not to implement it and just return 0 if no reliable way is possible.
 
