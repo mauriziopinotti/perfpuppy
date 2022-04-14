@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.example.perfpuppy.R
 import com.example.perfpuppy.data.CollectorService
 import com.example.perfpuppy.databinding.FragmentDashboardBinding
+import timber.log.Timber
 
 class DashboardFragment : Fragment() {
 
@@ -28,14 +29,32 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        binding.serviceToggleButton.text = getString(R.string.enable_data_collection)
         binding.serviceToggleButtonGroup.addOnButtonCheckedListener() { _, _, isChecked ->
             toggleCollectorService(isChecked)
-            binding.serviceToggleButton.text =
-                if (isChecked) getString(R.string.disable_data_collection) else getString(R.string.enable_data_collection)
+            setServiceToggleButtonText(isChecked)
         }
 
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Service enabled button
+        CollectorService.isServiceRunning(requireContext()).also {
+            Timber.d("Checking collector service running: $it")
+            if (it) binding.serviceToggleButtonGroup.check(binding.serviceToggleButton.id)
+//            else binding.serviceToggleButtonGroup.clearChecked()
+            setServiceToggleButtonText(it)
+        }
+    }
+
+    private fun setServiceToggleButtonText(enabled: Boolean) {
+        Timber.d("setServiceToggleButtonText: enabled=$enabled")
+
+        binding.serviceToggleButton.text =
+            if (enabled) getString(R.string.disable_data_collection)
+            else getString(R.string.enable_data_collection)
     }
 
     override fun onDestroyView() {

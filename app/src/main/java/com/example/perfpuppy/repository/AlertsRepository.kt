@@ -7,6 +7,9 @@ import com.example.perfpuppy.database.DatabaseAlertItem
 import com.example.perfpuppy.database.asDomainModel
 import com.example.perfpuppy.domain.AlertItem
 import com.example.perfpuppy.domain.asDatabaseModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AlertsRepository @Inject constructor(
@@ -18,11 +21,13 @@ class AlertsRepository @Inject constructor(
             it.asDomainModel()
         }
 
-    suspend fun getAlerts(): LiveData<List<DatabaseAlertItem>> {
-        return database.alertsDao.getDatabaseAlerts()
-    }
+//    suspend fun getAlerts(): LiveData<List<DatabaseAlertItem>> {
+//        return database.alertsDao.getDatabaseAlerts()
+//    }
 
-    suspend fun addAlert(alert: AlertItem) {
-        database.alertsDao.insert(alert.asDatabaseModel())
+    fun addAlert(alert: AlertItem) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database.alertsDao.insert(alert.asDatabaseModel())
+        }
     }
 }

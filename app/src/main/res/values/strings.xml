@@ -7,8 +7,8 @@
 
     <string name="dashboard_help">
         Welcome to PerfPuppy!\n\n
-        You can enable or disable data collection with the toggle button below.\n
-        PerfPuppy comes with sensible default but can tweak it to your needs in the \"Settings\" section.\n
+        You can enable or disable data collection with the toggle button below.\n\n
+        PerfPuppy comes with sensible default but can tweak it to your needs in the \"Settings\" section.\n\n
         All alerts will be stored in a database and you can view them in the \"Alerts\" section but don\'t forget to clear app data every now and then.\n
     </string>
     <string name="enable_data_collection">Enable data collection</string>

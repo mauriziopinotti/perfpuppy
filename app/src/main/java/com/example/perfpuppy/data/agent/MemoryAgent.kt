@@ -36,12 +36,16 @@ class MemoryAgent(
             }
             reader.close()
 
+            // MemAvailable: the amount of memory available for starting new applications without swapping.
+            // MemFree: the amount of physical RAM, in KB, left unused by the system.
             val total = lines[0][1].toLong()
             val free = lines[1][1].toLong()
+            val available = lines[2][1].toLong()
             val cached = lines[3][1].toLong()
-            val used = total - free - cached
+//            val used = total - free - cached
+            val used = available * 100 / total
 
-            return (used * 100 / total).toInt()
+            return 100 - used.toInt()
         } catch (e: Exception) {
             Timber.w("Cannot parse /proc/meminfo", e)
             return 0

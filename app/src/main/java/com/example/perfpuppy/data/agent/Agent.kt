@@ -8,15 +8,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.preference.PreferenceManager
 import com.example.perfpuppy.BuildConfig
 import com.example.perfpuppy.data.CollectorServiceCallback
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import kotlin.concurrent.thread
 
 abstract class Agent(
-    private val service: CollectorServiceCallback,
+    protected val service: CollectorServiceCallback,
     private val lifecycle: Lifecycle,
 ) : DefaultLifecycleObserver {
 
@@ -49,70 +45,34 @@ abstract class Agent(
     }
 
     private var enabled = false
+    private var currentlyAboveTh = false
 
-    override fun onStart(owner: LifecycleOwner) {
-//        if (enabled) {
-//            thread(start = true) {
-//                runBlocking {
-//                    launch(Dispatchers.IO) {
-//                        collectDataLoop()
-//                    }
-//                }
-//            }
-//        }
-    }
-
-    suspend fun enable() {
+    open suspend fun enable() {
         if (!enabled && lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             enabled = true
-//            runBlocking {
-                collectDataLoop()
-//            }
+            currentlyAboveTh = false
+            collectDataLoop()
         }
     }
 
-//    fun disable() {
-//        enabled = false
-//    }
-
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
+        Timber.d("Agent lifecycle: onCreate $name")
     }
 
-//    override fun onStop(owner: LifecycleOwner) {
-//        disable()
-//    }
-
     override fun onDestroy(owner: LifecycleOwner) {
-        Timber.i("Agent lifecycle: onDestroy")
         super.onDestroy(owner)
-//        disable()
+        Timber.d("Agent lifecycle: onDestroy $name")
+
         enabled = false
     }
 
     private suspend fun collectDataLoop() {
         Timber.i("Starting loop for agent $name on thread ${Thread.currentThread().name}")
 
-        var currentlyAboveTh = false
         while (enabled) {
             // Get data
-            with(getData()) {
-                // Ensure it's in range
-                if (value < 0 || value > 100) {
-                    Timber.w("Invalid data from agent $name: $value")
-                } else {
-                    Timber.i("$name returned value=$value, isAbove=$valueIsAboveTh/$currentlyAboveTh")
-
-                    // If above or below th then report back to CollectorService
-                    if (!currentlyAboveTh && valueIsAboveTh) {
-                        currentlyAboveTh = true
-                        service.onDataAboveTh(this@Agent, value)
-                    } else if (currentlyAboveTh && !valueIsAboveTh) {
-                        currentlyAboveTh = false
-                        service.onDataBelowTh(this@Agent, value)
-                    }
-                }
-            }
+            setData(getData())
 
             // Sleep until next cycle
             // TODO: configurable interval?
@@ -121,6 +81,24 @@ abstract class Agent(
         }
 
         Timber.i("Ending loop for agent $name")
+    }
+
+    protected fun setData(data: PerfValue) {
+        // Ensure it's in range
+        if (data.value < 0 || data.value > 100) {
+            Timber.w("Invalid data from agent $name: ${data.value}")
+        } else {
+            Timber.i("$name returned value=${data.value}, isAbove=${data.valueIsAboveTh}/$currentlyAboveTh")
+
+            // If above or below th then report back to CollectorService
+            if (!currentlyAboveTh && data.valueIsAboveTh) {
+                currentlyAboveTh = true
+                service.onDataAboveTh(this@Agent, data.value)
+            } else if (currentlyAboveTh && !data.valueIsAboveTh) {
+                currentlyAboveTh = false
+                service.onDataBelowTh(this@Agent, data.value)
+            }
+        }
     }
 
     /**

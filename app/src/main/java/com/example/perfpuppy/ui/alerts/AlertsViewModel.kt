@@ -17,7 +17,7 @@ class AlertsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            alertsRepository.getAlerts()
+            alertsRepository.alerts
         }
     }
 }

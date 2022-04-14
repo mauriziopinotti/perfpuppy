@@ -1,9 +1,6 @@
 package com.example.perfpuppy.data
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
@@ -15,6 +12,7 @@ import androidx.lifecycle.LifecycleService
 import com.example.perfpuppy.MainActivity
 import com.example.perfpuppy.R
 import com.example.perfpuppy.data.agent.Agent
+import com.example.perfpuppy.data.agent.BatteryAgent
 import com.example.perfpuppy.data.agent.CpuAgent
 import com.example.perfpuppy.data.agent.MemoryAgent
 import com.example.perfpuppy.domain.AlertItem
@@ -28,6 +26,7 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
+
 /**
  * The collector service is responsible for spawning all the agents and displaying notifications
  * when a value is above/below thresholds.
@@ -36,9 +35,17 @@ import kotlin.concurrent.thread
 class CollectorService : LifecycleService(), CollectorServiceCallback {
 
     companion object {
+        private const val THRESHOLD_CHANNEL_ID = "Threshold"
         private const val FOREGROUND_CHANNEL_ID = "Foreground"
         private const val FOREGROUND__NOTIF_ID = 666
-        private const val THRESHOLD_CHANNEL_ID = "Threshold"
+
+        fun isServiceRunning(context: Context): Boolean {
+            val manager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+                if (service.service.className == CollectorService::class.java.name) return true
+            }
+            return false
+        }
     }
 
     @Inject
@@ -74,39 +81,29 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
 
     private fun spawnAgents() {
         // Create agents
-        var notifId = 1;
-
-        // CPU agent
-        val cpuAgent = CpuAgent(this@CollectorService, lifecycle)
-        notifIds[cpuAgent] = notifId++
-        lifecycle.addObserver(cpuAgent)
-
-        // Memory agent
-        val memAgent = MemoryAgent(this@CollectorService, lifecycle)
-        notifIds[memAgent] = notifId++
-        lifecycle.addObserver(memAgent)
-
-        // Battery agent
-//        val batAgent = BatteryAgent(this@CollectorService, lifecycle)
-//        notifIds[batAgent] = notifId++
-//        lifecycle.addObserver(batAgent!!)
+        val agents = listOf(
+            // CPU agent
+            CpuAgent(this@CollectorService, lifecycle),
+            // Memory agent
+            MemoryAgent(this@CollectorService, lifecycle),
+            // Battery agent
+            BatteryAgent(this@CollectorService, lifecycle),
+        )
+        agents.forEachIndexed { i, agent ->
+            // Group together notifications of the same agent
+            notifIds[agent] = i
+            // Tie agent lifecycle to collector service lifecycle
+            lifecycle.addObserver(agent)
+        }
 
         // Spawn agents on separate thread
         thread(start = true) {
             runBlocking {
-                agentsJob = launch(Dispatchers.IO) {
-                    cpuAgent.enable()
-                    memAgent.enable()
-//                    batAgent.enable()
+                agents.forEach {
+                    launch(Dispatchers.IO) { it.enable() }
                 }
             }
         }
-
-//        val bm = getSystemService(BATTERY_SERVICE) as BatteryManager
-//        println("BATTERY_PROPERTY_CURRENT_NOW: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW))
-//        println("BATTERY_PROPERTY_STATUS: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_STATUS))
-//        println("BATTERY_PROPERTY_CHARGE_COUNTER: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER))
-//        println("BATTERY_PROPERTY_CURRENT_AVERAGE: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE))
     }
 
     private fun createNotificationChannels() {
@@ -169,7 +166,7 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
 
     override val context: Context by lazy { applicationContext }
 
-    override suspend fun onDataAboveTh(agent: Agent, value: Int) {
+    override fun onDataAboveTh(agent: Agent, value: Int) {
         Timber.w("onDataAboveTh(): agent=${agent.name}, value=$value")
 
         // Log the alert in the repository
@@ -180,7 +177,7 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
         notificationManager.notify(notifIds[agent]!!, createAlertNotification(agent, message))
     }
 
-    override suspend fun onDataBelowTh(agent: Agent, value: Int) {
+    override fun onDataBelowTh(agent: Agent, value: Int) {
         Timber.w("onDataBelowTh(): agent=${agent.name}, value=$value")
 
         // Log the alert in the repository
@@ -198,10 +195,10 @@ interface CollectorServiceCallback {
     /**
      * Called when an agent finds a value above the threshold (i.e. in error state)
      */
-    suspend fun onDataAboveTh(agent: Agent, value: Int)
+    fun onDataAboveTh(agent: Agent, value: Int)
 
     /**
      * Called when an agent finds a value below the threshold (i.e. in normal state)
      */
-    suspend fun onDataBelowTh(agent: Agent, value: Int)
+    fun onDataBelowTh(agent: Agent, value: Int)
 }
