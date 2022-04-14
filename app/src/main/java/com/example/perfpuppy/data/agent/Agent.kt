@@ -11,11 +11,22 @@ import com.example.perfpuppy.data.CollectorServiceCallback
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
+/**
+ * A generic data collection agent that runs an infinite loop and collects data every X seconds.
+ *
+ * Actual agents should subclass this and implement getData() plus a few more self-explaining methods.
+ * If an agent wants to implement a different behavior than infinite-loop it can also override enable()
+ * and prevent the loop by being created by not calling super(). In this case values should be reported
+ * calling setData() directly.
+ */
 abstract class Agent(
     protected val service: CollectorServiceCallback,
     private val lifecycle: Lifecycle,
 ) : DefaultLifecycleObserver {
 
+    /**
+     * An object holding two values: the data value collected and a boolean saying if it's above or below the threshold.
+     */
     protected data class PerfValue(val value: Int, val valueIsAboveTh: Boolean)
 
     /**
