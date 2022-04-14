@@ -77,8 +77,33 @@ Plase notice the value reported to `CollectorService` is a `PerfValue` object wi
 * the actual `value` expressed in percentage (e.g. "80")
 * a boolean to tell if `valueIsAboveTh`: this is needed because "above the threshold" actually means "in an error state" and the logic could be agent-specific (for example `BatteryAgent` sets `valueIsAboveTh` to `true` when the value is below the threshold).
 
+Finally, enable the agent by modifying `CollectorService.spawnAgents()` and add the new agent to the `agents` list.
+
 ### CPU load
 
 Starting from Android O it's no longer possible to collect cpu usage bacause it's an "information leak". See this [official thread](https://issuetracker.google.com/issues/37140047?pli=1). In the app I've implemented a few workarounds but they only work on older and rooted devices. In the market there are a few "cpu monitoring" tools, all of them either don't work or use the cpu frequency to assume the load. Since this approach is totally misleading I've decided not to implement it and just return 0 if no reliable way is possible.
+
+## Notifications
+
+Notificatons are grouped by agent (to avoid flooding the user), which means that there won't be no more than 1 notification per agent, plus the presistent notification to keep collector service in foreground. When a new alert is raised it overwrites any previous notification from the same agent.
+
+All alerts can be seen in the "Alerts" section by the way.
+
+## Next steps (design improvements)
+
+Here's a few ideas:
+
+* create a layout optimized for tablets and landscape screens
+* show current values (cpu, mem, battery) to the user somehow, i.e. in the persistent notification or in the dashboard
+* add charts for collcted data
+* use NDK and JNI to collect data in a more performant way
+* use Compose for layouts
+* do more tests about power consumption to fine tune the infinite loop interval (currenly set to 60'' in release and 5'' in debug)
+* let the user choose the infinite loop interval to balance the trade off between accuracy and battery drain
+* add a button to clear alerts
+* improve the alerts section with sorting and filters
+* let the user choose which agents should run individually
+* add actions to start and stop the collection service from the notification
+* start the service at boot (configurable)
 
 
