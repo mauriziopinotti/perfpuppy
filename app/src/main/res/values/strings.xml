@@ -11,8 +11,8 @@
         PerfPuppy comes with sensible default but can tweak it to your needs in the \"Settings\" section.\n
         All alerts will be stored in a database and you can view them in the \"Alerts\" section but don\'t forget to clear app data every now and then.\n
     </string>
-    <string name="enable">Enable data collection</string>
-    <string name="disable">Disable data collection</string>
+    <string name="enable_data_collection">Enable data collection</string>
+    <string name="disable_data_collection">Data collection enabled</string>
 
     <string name="no_alerts">Wow, such empty!</string>
 

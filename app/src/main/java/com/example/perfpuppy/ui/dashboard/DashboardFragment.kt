@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.perfpuppy.R
 import com.example.perfpuppy.data.CollectorService
 import com.example.perfpuppy.databinding.FragmentDashboardBinding
 
@@ -27,10 +28,11 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        dashboardViewModel.serviceEnabled.observe(viewLifecycleOwner) {
-//        }
-        binding.serviceToggleButton.setOnCheckedChangeListener { _, isChecked ->
+        binding.serviceToggleButton.text = getString(R.string.enable_data_collection)
+        binding.serviceToggleButtonGroup.addOnButtonCheckedListener() { _, _, isChecked ->
             toggleCollectorService(isChecked)
+            binding.serviceToggleButton.text =
+                if (isChecked) getString(R.string.disable_data_collection) else getString(R.string.enable_data_collection)
         }
 
         return root

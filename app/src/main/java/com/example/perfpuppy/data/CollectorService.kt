@@ -9,9 +9,7 @@ import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.os.Binder
 import android.os.Build
-import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import com.example.perfpuppy.MainActivity
@@ -50,25 +48,8 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private var cpuAgent: Agent? = null
-    private var cpuAgentJob: Job? = null
-    private var memAgent: Agent? = null
-    private var memAgentJob: Job? = null
-    private var batAgent: Agent? = null
-    private var batAgentJob: Job? = null
-
     private val notifIds = mutableMapOf<Agent, Int>()
-
-    private val binder = LocalBinder()
-
-    inner class LocalBinder : Binder() {
-        fun getService(): CollectorService = this@CollectorService
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        super.onBind(intent)
-        return binder
-    }
+    private var agentsJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -78,7 +59,7 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
         startForeground(FOREGROUND__NOTIF_ID, createForegroundNotification())
 
         // Start all agents
-        startAgents()
+        spawnAgents()
     }
 
     override fun onDestroy() {
@@ -87,56 +68,45 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
         // Clear all notifications
         notificationManager.cancelAll()
 
-        // Stop all agents
-        stopAgents()
+        // Cancel agents job
+        agentsJob?.cancel()
     }
 
-    private fun startAgents() {
-        // Spawn agents
+    private fun spawnAgents() {
+        // Create agents
+        var notifId = 1;
+
+        // CPU agent
+        val cpuAgent = CpuAgent(this@CollectorService, lifecycle)
+        notifIds[cpuAgent] = notifId++
+        lifecycle.addObserver(cpuAgent)
+
+        // Memory agent
+        val memAgent = MemoryAgent(this@CollectorService, lifecycle)
+        notifIds[memAgent] = notifId++
+        lifecycle.addObserver(memAgent)
+
+        // Battery agent
+//        val batAgent = BatteryAgent(this@CollectorService, lifecycle)
+//        notifIds[batAgent] = notifId++
+//        lifecycle.addObserver(batAgent!!)
+
+        // Spawn agents on separate thread
         thread(start = true) {
             runBlocking {
-                var notifId = 1;
-
-                // CPU agent
-                cpuAgent = CpuAgent(this@CollectorService, lifecycle);
-                notifIds[cpuAgent!!] = notifId++
-                cpuAgentJob = launch(Dispatchers.IO) {
-                    cpuAgent!!.enable()
+                agentsJob = launch(Dispatchers.IO) {
+                    cpuAgent.enable()
+                    memAgent.enable()
+//                    batAgent.enable()
                 }
-
-                // Memory agent
-                memAgent = MemoryAgent(this@CollectorService, lifecycle);
-                notifIds[memAgent!!] = notifId++
-                memAgentJob = launch(Dispatchers.IO) {
-                    memAgent!!.enable()
-                }
-
-                // Battery agent
-//                batAgent = BatteryAgent(this@CollectorService, lifecycle);
-//                notifIds[batAgent!!] = notifId++
-//                batAgentJob = launch(Dispatchers.IO) {
-//                    batAgent!!.enable()
-//                }
             }
         }
-
 
 //        val bm = getSystemService(BATTERY_SERVICE) as BatteryManager
 //        println("BATTERY_PROPERTY_CURRENT_NOW: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW))
 //        println("BATTERY_PROPERTY_STATUS: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_STATUS))
 //        println("BATTERY_PROPERTY_CHARGE_COUNTER: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER))
 //        println("BATTERY_PROPERTY_CURRENT_AVERAGE: "+bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE))
-    }
-
-    private fun stopAgents() {
-        cpuAgent?.disable()
-        cpuAgentJob?.cancel()
-
-        memAgent?.disable()
-        memAgentJob?.cancel()
-
-        batAgent?.disable()
-        batAgentJob?.cancel()
     }
 
     private fun createNotificationChannels() {
@@ -224,6 +194,14 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
 
 interface CollectorServiceCallback {
     val context: Context
+
+    /**
+     * Called when an agent finds a value above the threshold (i.e. in error state)
+     */
     suspend fun onDataAboveTh(agent: Agent, value: Int)
+
+    /**
+     * Called when an agent finds a value below the threshold (i.e. in normal state)
+     */
     suspend fun onDataBelowTh(agent: Agent, value: Int)
 }

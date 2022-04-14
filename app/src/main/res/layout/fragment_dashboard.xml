@@ -44,18 +44,21 @@
                 app:layout_constraintTop_toBottomOf="@+id/logo"
                 tools:text="@string/dashboard_help" />
 
-            <ToggleButton
-                android:id="@+id/serviceToggleButton"
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/serviceToggleButtonGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textOff="@string/enable"
-                android:textOn="@string/disable"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/helpText" />
-            <!--            android:checked="@{viewModel.serviceEnabled}"-->
-            <!--            android:onCheckedChanged="@{(view, bool) -> viewModel.onServiceEnabled(bool)}"-->
+                app:layout_constraintTop_toBottomOf="@+id/helpText">
+
+                <Button
+                    android:id="@+id/serviceToggleButton"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="@string/enable_data_collection" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

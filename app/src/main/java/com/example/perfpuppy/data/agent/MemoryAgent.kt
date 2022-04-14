@@ -43,7 +43,7 @@ class MemoryAgent(
 
             return (used * 100 / total).toInt()
         } catch (e: Exception) {
-            Timber.w("Cannot parse /proc/meminfo")
+            Timber.w("Cannot parse /proc/meminfo", e)
             return 0
         }
     }

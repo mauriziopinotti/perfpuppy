@@ -1,7 +1,6 @@
 package com.example.perfpuppy.data.agent
 
 import android.os.Build
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import com.example.perfpuppy.R
 import com.example.perfpuppy.data.CollectorServiceCallback
@@ -9,6 +8,8 @@ import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.FileReader
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import kotlin.math.max
 import kotlin.math.min
 
@@ -18,6 +19,13 @@ class CpuAgent(
 ) : Agent(service, lifecycle) {
 
     internal class NotSupportedException : RuntimeException()
+
+    companion object {
+        private val TOP_PATTERN_1: Pattern =
+            Pattern.compile("(\\d+)%cpu\\s+(\\d+)%user\\s+(\\d+)%nice\\s+(\\d+)%sys\\s+(\\d+)%idle\\s+(\\d+)%iow\\s+(\\d+)%irq")
+        private val TOP_PATTERN_2: Pattern =
+            Pattern.compile("User\\s+(\\d+)%,\\s+System\\s+(\\d+)%,\\s+IOW\\s+(\\d+)%,\\s+IRQ\\s+(\\d+)%")
+    }
 
     override val name: String
         get() = context.getString(R.string.cpu_agent_name)
@@ -53,8 +61,8 @@ class CpuAgent(
         if (data != null) return data.toPerfValue(th)
 
         // Fallback to frequency
-        data = tryGetData(this::getFromFrequency)
-        if (data != null) return data.toPerfValue(th)
+//        data = tryGetData(this::getFromFrequency)
+//        if (data != null) return data.toPerfValue(th)
 
         return 0.toPerfValue(th)
     }
@@ -62,8 +70,7 @@ class CpuAgent(
     private suspend fun tryGetData(method: suspend () -> Int, prefKey: String? = null): Int? {
         try {
             // Try loading data using this method, unless we already know it's not supported
-            if (prefKey == null || prefs.getBoolean(prefKey, true))
-                return method.invoke()
+            if (prefKey == null || prefs.getBoolean(prefKey, true)) return method.invoke()
         } catch (e: NotSupportedException) {
             // Not supported, save this in prefs so that we don't try again next time
             Timber.w("$method is not supported on this device")
@@ -102,35 +109,55 @@ class CpuAgent(
         return listOf(work, total)
     }
 
-    private suspend fun getFromVmStat(): Int {
-        val reader = Runtime.getRuntime()
-            .exec("vmstat")
-            .inputStream
-            .bufferedReader()
-//        for (i in 1..3) {
-//            output = reader.readLine()
-//            Log.d("vmstat", "VMSTAT Riga $i: " + output)
-//        }
-        // TODO
-        return 0;
-    }
+    private fun getFromVmStat(): Int {
+        try {
+            val reader = Runtime.getRuntime()
+                .exec(arrayOf("vmstat", "0", "1"))
+                .inputStream
+                .bufferedReader()
+            var output: String? = null
+            repeat(3) { output = reader.readLine() }
+            val sa = output!!.split("[ ]+".toRegex()).toTypedArray()
+            reader.close()
 
-    private suspend fun getFromTop(): Int {
-        var reader = Runtime.getRuntime()
-            .exec("top -n1")
-            .inputStream
-            .bufferedReader()
-        var output: String? = null
-        for (i in 1..4) {
-            output = reader.readLine()
-            Log.d("vmstat", "TOP Riga $i: " + output)
+            return 100 - sa[sa.size - 2].toInt()
+        } catch (e: Exception) {
+            Timber.w("Cannot parse vmstat output", e)
         }
-        // TODO
-        return 0
+        throw NotSupportedException()
     }
 
-    private suspend fun getFromFrequency(): Int {
-        // TODO
-        return 0
+    private fun getFromTop(): Int {
+        try {
+            val output = Runtime.getRuntime()
+                .exec(arrayOf("top", "-n", "1", "-m", "1"))
+                .inputStream
+                .bufferedReader()
+                .use { it.readText() }
+
+            // Try mothod 1 (newe devices like Pixel 4)
+            val m1: Matcher = TOP_PATTERN_1.matcher(output)
+            if (m1.find()) {
+                val total = m1.group(1)?.toInt() ?: 0
+                val idle = m1.group(5)?.toInt() ?: 0
+                val numCores = total / 100;
+
+                return (total - idle) / numCores
+            }
+
+            // Try method 2 (legacy devices like Nexus 4)
+            val m2: Matcher = TOP_PATTERN_2.matcher(output)
+            if (m2.find()) {
+                val user = m2.group(1)?.toInt() ?: 0
+                val system = m2.group(2)?.toInt() ?: 0
+                val iow = m2.group(3)?.toInt() ?: 0
+                val irq = m2.group(4)?.toInt() ?: 0
+
+                return user + system + iow + irq
+            }
+        } catch (e: Exception) {
+            Timber.w("Cannot parse top output", e)
+        }
+        throw NotSupportedException()
     }
 }

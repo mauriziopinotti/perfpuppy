@@ -8,9 +8,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.preference.PreferenceManager
 import com.example.perfpuppy.BuildConfig
 import com.example.perfpuppy.data.CollectorServiceCallback
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import kotlin.concurrent.thread
 
 abstract class Agent(
     private val service: CollectorServiceCallback,
@@ -48,33 +51,43 @@ abstract class Agent(
     private var enabled = false
 
     override fun onStart(owner: LifecycleOwner) {
-        if (enabled) {
-            runBlocking {
-                collectDataLoop()
-            }
-        }
+//        if (enabled) {
+//            thread(start = true) {
+//                runBlocking {
+//                    launch(Dispatchers.IO) {
+//                        collectDataLoop()
+//                    }
+//                }
+//            }
+//        }
     }
 
-    fun enable() {
+    suspend fun enable() {
         if (!enabled && lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             enabled = true
-            runBlocking {
+//            runBlocking {
                 collectDataLoop()
-            }
+//            }
         }
     }
 
-    fun disable() {
-        enabled = false
+//    fun disable() {
+//        enabled = false
+//    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
     }
 
-    override fun onStop(owner: LifecycleOwner) {
-        disable()
-    }
+//    override fun onStop(owner: LifecycleOwner) {
+//        disable()
+//    }
 
     override fun onDestroy(owner: LifecycleOwner) {
+        Timber.i("Agent lifecycle: onDestroy")
         super.onDestroy(owner)
-        disable()
+//        disable()
+        enabled = false
     }
 
     private suspend fun collectDataLoop() {
@@ -104,7 +117,7 @@ abstract class Agent(
             // Sleep until next cycle
             // TODO: configurable interval?
             Timber.d("Agent $name waiting for next cycle...")
-            delay(if (BuildConfig.DEBUG) 1000 else 60000)
+            delay(if (BuildConfig.DEBUG) 5000 else 60000)
         }
 
         Timber.i("Ending loop for agent $name")
