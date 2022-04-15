@@ -7,6 +7,7 @@ import com.example.perfpuppy.domain.AlertItem
 
 @Entity(tableName = "alerts")
 data class DatabaseAlertItem constructor(
+
     @PrimaryKey(autoGenerate = true)
     val id: Int,
 

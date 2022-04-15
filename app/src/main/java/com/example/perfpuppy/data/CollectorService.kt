@@ -84,11 +84,11 @@ class CollectorService : LifecycleService(), CollectorServiceCallback {
         // Create agents
         val agents = listOf(
             // CPU agent
-            CpuAgent(this@CollectorService, lifecycle),
+            CpuAgent(this@CollectorService), //, lifecycle),
             // Memory agent
-            MemoryAgent(this@CollectorService, lifecycle),
+            MemoryAgent(this@CollectorService), //, lifecycle),
             // Battery agent
-            BatteryAgent(this@CollectorService, lifecycle),
+            BatteryAgent(this@CollectorService), //, lifecycle),
         )
         agents.forEachIndexed { i, agent ->
             // Group together notifications of the same agent

@@ -16,7 +16,7 @@ class AlertsRepository @Inject constructor(
 ) {
 
     val alerts: LiveData<List<AlertItem>> =
-        Transformations.map(database.alertsDao.getDatabaseAlerts()) {
+        Transformations.map(database.alertsDao.getAllAlerts()) {
             it.asDomainModel()
         }
 

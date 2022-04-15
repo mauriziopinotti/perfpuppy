@@ -2,6 +2,7 @@ package com.example.perfpuppy.data.agent
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -10,6 +11,7 @@ import com.example.perfpuppy.BuildConfig
 import com.example.perfpuppy.data.CollectorServiceCallback
 import kotlinx.coroutines.delay
 import timber.log.Timber
+import java.lang.reflect.Modifier.PROTECTED
 
 /**
  * A generic data collection agent that runs an infinite loop and collects data every X seconds.
@@ -21,13 +23,14 @@ import timber.log.Timber
  */
 abstract class Agent(
     protected val service: CollectorServiceCallback,
-    private val lifecycle: Lifecycle,
+//    private val lifecycle: Lifecycle,
 ) : DefaultLifecycleObserver {
 
     /**
      * An object holding two values: the data value collected and a boolean saying if it's above or below the threshold.
      */
-    protected data class PerfValue(val value: Int, val valueIsAboveTh: Boolean)
+    @VisibleForTesting(otherwise = PROTECTED)
+    data class PerfValue(val value: Int, val valueIsAboveTh: Boolean)
 
     /**
      * The name of this agent, it's used in the logs and also shown to the user. Must be short and yet expressive.
@@ -47,7 +50,8 @@ abstract class Agent(
     /**
      * Returns the data for this agent, expressed as percentage in the range [0..100].
      */
-    protected abstract suspend fun getData(): PerfValue
+    @VisibleForTesting(otherwise = PROTECTED)
+    abstract suspend fun getData(): PerfValue
 
     protected val context: Context = service.context
 
@@ -66,7 +70,9 @@ abstract class Agent(
     open suspend fun enable() {
         Timber.d("Agent lifecycle: enable=$enabled $name")
 
+//        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
         collectDataLoop()
+//        }
     }
 
     override fun onCreate(owner: LifecycleOwner) {

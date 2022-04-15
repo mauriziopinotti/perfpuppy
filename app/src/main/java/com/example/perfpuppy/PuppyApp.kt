@@ -1,9 +1,10 @@
 package com.example.perfpuppy
 
 import android.app.Application
+import android.os.Build
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
-import kotlin.concurrent.thread
 
 @HiltAndroidApp
 class PuppyApp : Application() {
@@ -11,8 +12,16 @@ class PuppyApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+        // Timber
+        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+
+        // Crashlytics
+        if (!isUnitTest()) {
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
         }
     }
+}
+
+fun isUnitTest(): Boolean {
+    return "robolectric" == Build.FINGERPRINT
 }

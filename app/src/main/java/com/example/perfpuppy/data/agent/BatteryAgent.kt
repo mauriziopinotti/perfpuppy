@@ -13,8 +13,8 @@ import com.example.perfpuppy.data.CollectorServiceCallback
 
 class BatteryAgent(
     service: CollectorServiceCallback,
-    lifecycle: Lifecycle,
-) : Agent(service, lifecycle) {
+//    lifecycle: Lifecycle,
+) : Agent(service) {
 
     override val name: String
         get() = context.getString(R.string.bat_agent_name)

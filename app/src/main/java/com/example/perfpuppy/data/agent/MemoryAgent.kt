@@ -1,6 +1,5 @@
 package com.example.perfpuppy.data.agent
 
-import androidx.lifecycle.Lifecycle
 import com.example.perfpuppy.R
 import com.example.perfpuppy.data.CollectorServiceCallback
 import timber.log.Timber
@@ -9,8 +8,13 @@ import java.io.FileReader
 
 class MemoryAgent(
     service: CollectorServiceCallback,
-    lifecycle: Lifecycle,
-) : Agent(service, lifecycle) {
+//    lifecycle: Lifecycle,
+) : Agent(service) {
+
+    companion object {
+        // Not const to be overridden by testing
+        val MEMINFO_FILE = "/proc/meminfo"
+    }
 
     override val name: String
         get() = context.getString(R.string.mem_agent_name)
@@ -32,7 +36,7 @@ class MemoryAgent(
 
     private fun parseProcMemInfo(): Int {
         try {
-            val reader = BufferedReader(FileReader("/proc/meminfo"))
+            val reader = BufferedReader(FileReader(MEMINFO_FILE))
             val lines = mutableListOf<Array<String>>()
             repeat(4) {
                 lines.add(reader.readLine()?.split("[ ]+".toRegex())?.toTypedArray()!!)

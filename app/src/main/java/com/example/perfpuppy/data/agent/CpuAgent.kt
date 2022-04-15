@@ -1,7 +1,6 @@
 package com.example.perfpuppy.data.agent
 
 import android.os.Build
-import androidx.lifecycle.Lifecycle
 import com.example.perfpuppy.R
 import com.example.perfpuppy.data.CollectorServiceCallback
 import kotlinx.coroutines.delay
@@ -15,12 +14,15 @@ import kotlin.math.min
 
 class CpuAgent(
     service: CollectorServiceCallback,
-    lifecycle: Lifecycle,
-) : Agent(service, lifecycle) {
+//    lifecycle: Lifecycle,
+) : Agent(service) {
 
     internal class NotSupportedException : RuntimeException()
 
     companion object {
+        // Not const to be overridden by testing
+        val CPUINFO_FILE = "/proc/stat"
+
         private val TOP_PATTERN_1: Pattern =
             Pattern.compile("(\\d+)%cpu\\s+(\\d+)%user\\s+(\\d+)%nice\\s+(\\d+)%sys\\s+(\\d+)%idle\\s+(\\d+)%iow\\s+(\\d+)%irq")
         private val TOP_PATTERN_2: Pattern =
@@ -102,7 +104,7 @@ class CpuAgent(
     private fun parseProcStat(): List<Long> {
         // CPU usage percents calculation, it is possible negative values or values higher than 100% may appear.
         // http://kernel.org/doc/Documentation/filesystems/proc.txt
-        val reader = BufferedReader(FileReader("/proc/stat"))
+        val reader = BufferedReader(FileReader(CPUINFO_FILE))
         val sa = reader.readLine().split("[ ]+".toRegex(), 9).toTypedArray()
         reader.close()
 

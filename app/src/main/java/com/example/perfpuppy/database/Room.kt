@@ -7,7 +7,7 @@ import androidx.room.*
 interface AlertsDao {
 
     @Query("SELECT * FROM alerts ORDER BY created_at DESC")
-    fun getDatabaseAlerts(): LiveData<List<DatabaseAlertItem>>
+    fun getAllAlerts(): LiveData<List<DatabaseAlertItem>>
 
     @Insert
     fun insert(alerts: DatabaseAlertItem)
