@@ -1,7 +1,7 @@
 package com.example.perfpuppy.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.example.perfpuppy.database.AlertsDatabase
 import com.example.perfpuppy.database.asDomainModel
 import com.example.perfpuppy.domain.AlertItem
@@ -16,7 +16,7 @@ class AlertsRepository @Inject constructor(
 ) {
 
     val alerts: LiveData<List<AlertItem>> =
-        Transformations.map(database.alertsDao.getAllAlerts()) {
+        database.alertsDao.getAllAlerts().map {
             it.asDomainModel()
         }
 
